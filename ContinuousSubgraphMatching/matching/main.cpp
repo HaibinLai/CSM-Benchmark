@@ -10,11 +10,11 @@
 
 #include "graph/graph.h"
 #include "matching/matching.h"
-#include "matching/sj_tree.h"
-#include "matching/turboflux.h"
-#include "matching/graphflow.h"
-#include "matching/symbi.h"
-#include "matching/iedyn.h"
+#include "matching/SJTree/sj_tree.h"
+#include "matching/TurboFlux/turboflux.h"
+#include "matching/GraphFlow/graphflow.h"
+#include "matching/SymBi/symbi.h"
+#include "matching/Iedyn/iedyn.h"
 
 int main(int argc, char *argv[])
 {
