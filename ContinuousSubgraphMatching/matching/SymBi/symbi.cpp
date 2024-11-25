@@ -124,7 +124,9 @@ void SymBi::BuildDAG()
 
     // get the frequency of each query edge
     std::vector<std::vector<size_t>> edge_freqs(query_.NumVertices());
-    for (auto& vec: edge_freqs) vec.resize(query_.NumVertices(), 0ul);
+    for (auto& vec: edge_freqs) {
+        vec.resize(query_.NumVertices(), 0ul);
+    }
     size_t min_freq = ULONG_MAX;
     std::array<uint, 2> min_vs {};
 
@@ -678,8 +680,7 @@ void SymBi::AddEdge(uint v1, uint v2, uint label)
 
     // enumerate all query edges that matches v1 --> v2
     for (uint u1 = 0; u1 < query_.NumVertices(); u1++)
-    if (data_.GetVertexLabel(v1) == query_.GetVertexLabel(u1))
-    {
+    if (data_.GetVertexLabel(v1) == query_.GetVertexLabel(u1)){
     for (uint u2 = 0; u2 < query_.NumVertices(); u2++)
     if (data_.GetVertexLabel(v2) == query_.GetVertexLabel(u2))
     {
