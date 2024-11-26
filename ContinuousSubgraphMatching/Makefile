@@ -1,5 +1,10 @@
 CC = g++ -fdiagnostics-color=always
 FLAGS = -std=c++17 -g -O3 -Wall -I.
+
+FLAGS += -fopenmp
+
+OPENMP_FLAGS = -fopenmp
+
 LIBS = -pthread
 
 BUILD = build
@@ -15,6 +20,7 @@ GRAPHFLOW = $(MATCH)/GraphFlow
 SYMBI = $(MATCH)/SymBi
 SJ_TREE = $(MATCH)/SJTree
 TURBOFLUX = $(MATCH)/TurboFlux
+PARRALLEL = $(MATCH)/Parrallel
 
 all : dir $(BUILD)/csm
 
@@ -30,13 +36,15 @@ $(BUILD)/csm: $(OBJ)/main.o \
 		$(OBJ)/sj_tree.o $(OBJ)/graphflow.o \
 		$(OBJ)/turboflux.o $(OBJ)/symbi.o \
 		$(OBJ)/iedyn.o \
+		$(OBJ)/parrallel.o \
 		$(OBJ)/graph.o $(OBJ)/induced_graph.o \
-		$(OBJ)/globals.o
+		$(OBJ)/globals.o 
+		
 	$(CC) $(FLAGS) $(OBJ)/main.o \
 		$(OBJ)/matching.o \
 		$(OBJ)/sj_tree.o $(OBJ)/graphflow.o \
 		$(OBJ)/turboflux.o $(OBJ)/symbi.o \
-		$(OBJ)/iedyn.o \
+		$(OBJ)/iedyn.o $(OBJ)/parrallel.o \
 		$(OBJ)/graph.o $(OBJ)/induced_graph.o \
 		$(OBJ)/globals.o \
 		-o $(BUILD)/csm $(LIBS)
@@ -47,7 +55,8 @@ $(OBJ)/main.o: $(MATCH)/main.cpp \
 		$(GRAPH)/graph.h \
 		$(SJ_TREE)/sj_tree.h $(GRAPHFLOW)/graphflow.h \
 		$(TURBOFLUX)/turboflux.h $(SYMBI)/symbi.h \
-		$(IEDYN)/iedyn.h
+		$(IEDYN)/iedyn.h \
+		$(PARRALLEL)/parrallel.h
 	$(CC) -c $(FLAGS) $(MATCH)/main.cpp -o $(OBJ)/main.o
 
 #################### matching ####################
@@ -93,6 +102,14 @@ $(OBJ)/sj_tree.o: $(SJ_TREE)/sj_tree.cpp \
 	$(CC) -c $(FLAGS) $(SJ_TREE)/sj_tree.cpp \
 		-o $(OBJ)/sj_tree.o
 
+$(OBJ)/parrallel.o: $(PARRALLEL)/parrallel_symbi.cpp \
+		$(UTILS)/types.h $(UTILS)/globals.h \
+		$(GRAPH)/graph.cpp $(GRAPH)/induced_graph.h \
+		$(MATCH)/matching.h \
+		$(PARRALLEL)/parrallel.h
+	$(CC) -c $(FLAGS)  $(PARRALLEL)/parrallel_symbi.cpp \
+		-o $(OBJ)/parrallel.o
+
 $(OBJ)/matching.o: $(MATCH)/matching.cpp \
 		$(UTILS)/types.h \
 		$(GRAPH)/graph.h \
@@ -125,4 +142,5 @@ $(OBJ)/globals.o: $(UTILS)/globals.cpp $(UTILS)/globals.h
 .PHONY: clean
 
 clean: 
-	rm -r ${BUILD}
+	rm -r ${BUILD}/obj
+	rm ${BUILD}/csm

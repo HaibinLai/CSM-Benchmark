@@ -467,6 +467,7 @@ void SymBi::DeletionBottomUp(uint u, uint u_p, uint v, uint v_p)
     }
 }
 
+
 void SymBi::FindMatches(uint depth, std::vector<uint>& m, 
         std::vector<ExtendableVertex>& extendable, size_t &num_results)
 {
@@ -509,6 +510,7 @@ void SymBi::FindMatches(uint depth, std::vector<uint>& m,
 
     // enumerate each neighbor of m[u_min]
     bool candidate_empty = true;
+    
     for (auto& v: DCS_[eidx_[u_min][u]][m[u_min]])
     {
         // 1. check index
@@ -680,70 +682,69 @@ void SymBi::AddEdge(uint v1, uint v2, uint label)
 
     // enumerate all query edges that matches v1 --> v2
     for (uint u1 = 0; u1 < query_.NumVertices(); u1++)
-    if (data_.GetVertexLabel(v1) == query_.GetVertexLabel(u1)){
-    for (uint u2 = 0; u2 < query_.NumVertices(); u2++)
-    if (data_.GetVertexLabel(v2) == query_.GetVertexLabel(u2))
-    {
-        if (std::get<2>(query_.GetEdgeLabel(u1, u2)) != label) continue;
-        
-        bool reversed = false;
-        if (std::find(treeNode_[u1].backwards_.begin(), treeNode_[u1].backwards_.end(), u2) != treeNode_[u1].backwards_.end())
-        {
-            std::swap(u1, u2);
-            std::swap(v1, v2);
-            reversed = true;
-        }
-        if (std::find(treeNode_[u2].backwards_.begin(), treeNode_[u2].backwards_.end(), u1) != treeNode_[u2].backwards_.end())
-        {
-            auto it = std::lower_bound(DCS_[eidx_[u1][u2]][v1].begin(), DCS_[eidx_[u1][u2]][v1].end(), v2);
-            DCS_[eidx_[u1][u2]][v1].insert(it, v2);
-            it = std::lower_bound(DCS_[eidx_[u2][u1]][v2].begin(), DCS_[eidx_[u2][u1]][v2].end(), v1);
-            DCS_[eidx_[u2][u1]][v2].insert(it, v1);
+        if (data_.GetVertexLabel(v1) == query_.GetVertexLabel(u1)){
+            for (uint u2 = 0; u2 < query_.NumVertices(); u2++)
+                if (data_.GetVertexLabel(v2) == query_.GetVertexLabel(u2)){
+                    if (std::get<2>(query_.GetEdgeLabel(u1, u2)) != label) continue;
+                    
+                    bool reversed = false;
+                    if (std::find(treeNode_[u1].backwards_.begin(), treeNode_[u1].backwards_.end(), u2) != treeNode_[u1].backwards_.end())
+                    {
+                        std::swap(u1, u2);
+                        std::swap(v1, v2);
+                        reversed = true;
+                    }
+                    if (std::find(treeNode_[u2].backwards_.begin(), treeNode_[u2].backwards_.end(), u1) != treeNode_[u2].backwards_.end())
+                    {
+                        auto it = std::lower_bound(DCS_[eidx_[u1][u2]][v1].begin(), DCS_[eidx_[u1][u2]][v1].end(), v2);
+                        DCS_[eidx_[u1][u2]][v1].insert(it, v2);
+                        it = std::lower_bound(DCS_[eidx_[u2][u1]][v2].begin(), DCS_[eidx_[u2][u1]][v2].end(), v1);
+                        DCS_[eidx_[u2][u1]][v2].insert(it, v1);
 
-            bool old_p_d1 = d1[u1][v1], old_p_d2 = d2[u1][v1], old_c_d2 = d2[u2][v2];
+                        bool old_p_d1 = d1[u1][v1], old_p_d2 = d2[u1][v1], old_c_d2 = d2[u2][v2];
 
-            if (old_p_d1)
-                InsertionTopDown(u1, u2, v1, v2);
-            if (old_c_d2)
-                InsertionBottomUp(u2, u1, v2, v1);
-            if (old_p_d2)
-                n2[eidx_[u2][u1]][v2] += 1;
+                        if (old_p_d1)
+                            InsertionTopDown(u1, u2, v1, v2);
+                        if (old_c_d2)
+                            InsertionBottomUp(u2, u1, v2, v1);
+                        if (old_p_d2)
+                            n2[eidx_[u2][u1]][v2] += 1;
 
-            while (!Q1.empty())
-            {
-                auto [u_queue, v_queue] = Q1.front();
-                Q1.pop();
-                for (auto& u_c_queue : treeNode_[u_queue].forwards_)
-                for (auto& v_c_queue : DCS_[eidx_[u_queue][u_c_queue]][v_queue])
-                {
-                    InsertionTopDown(u_queue, u_c_queue, v_queue, v_c_queue);
-                    if (reach_time_limit) return;
+                        while (!Q1.empty())
+                        {
+                            auto [u_queue, v_queue] = Q1.front();
+                            Q1.pop();
+                            for (auto& u_c_queue : treeNode_[u_queue].forwards_)
+                            for (auto& v_c_queue : DCS_[eidx_[u_queue][u_c_queue]][v_queue])
+                            {
+                                InsertionTopDown(u_queue, u_c_queue, v_queue, v_c_queue);
+                                if (reach_time_limit) return;
+                            }
+                        }
+                        while (!Q2.empty())
+                        {
+                            auto [u_queue, v_queue] = Q2.front();
+                            Q2.pop();
+                            for (auto& u_p_queue : treeNode_[u_queue].backwards_)
+                            for (auto& v_p_queue : DCS_[eidx_[u_queue][u_p_queue]][v_queue])
+                            {
+                                InsertionBottomUp(u_queue, u_p_queue, v_queue, v_p_queue);
+                                if (reach_time_limit) return;
+                            }
+                            for (auto& u_c_queue : treeNode_[u_queue].forwards_)
+                            for (auto& v_c_queue : DCS_[eidx_[u_queue][u_c_queue]][v_queue])
+                            {
+                                n2[eidx_[u_c_queue][u_queue]][v_c_queue] += 1;
+                                if (reach_time_limit) return;
+                            }
+                        }
+                    }
+                    if (reversed)
+                    {
+                        std::swap(u1, u2);
+                        std::swap(v1, v2);
+                    }
                 }
-            }
-            while (!Q2.empty())
-            {
-                auto [u_queue, v_queue] = Q2.front();
-                Q2.pop();
-                for (auto& u_p_queue : treeNode_[u_queue].backwards_)
-                for (auto& v_p_queue : DCS_[eidx_[u_queue][u_p_queue]][v_queue])
-                {
-                    InsertionBottomUp(u_queue, u_p_queue, v_queue, v_p_queue);
-                    if (reach_time_limit) return;
-                }
-                for (auto& u_c_queue : treeNode_[u_queue].forwards_)
-                for (auto& v_c_queue : DCS_[eidx_[u_queue][u_c_queue]][v_queue])
-                {
-                    n2[eidx_[u_c_queue][u_queue]][v_c_queue] += 1;
-                    if (reach_time_limit) return;
-                }
-            }
-        }
-        if (reversed)
-        {
-            std::swap(u1, u2);
-            std::swap(v1, v2);
-        }
-    }
     }
     if (max_num_results_ == 0) return;
     

@@ -14,7 +14,9 @@
 #include "matching/TurboFlux/turboflux.h"
 #include "matching/GraphFlow/graphflow.h"
 #include "matching/SymBi/symbi.h"
+#include "matching/Parrallel/parrallel.h"
 #include "matching/Iedyn/iedyn.h"
+
 
 int main(int argc, char *argv[])
 {
@@ -61,8 +63,9 @@ int main(int argc, char *argv[])
     Graphflow *graphflow = nullptr;
     TurboFlux *turboflux = nullptr;
     SymBi *symbi = nullptr;
+    Parrllel_SymBi *parrallel = nullptr;
     IEDyn *iedyn = nullptr;
-
+    
     start = Get_Time();
 
     if (algorithm == "sj-tree")
@@ -75,6 +78,8 @@ int main(int argc, char *argv[])
         mm = symbi          = new SymBi         (query_graph, data_graph, max_num_results, print_prep, print_enum, homo, orders);
     else if (algorithm == "iedyn")
         mm = iedyn          = new IEDyn         (query_graph, data_graph, max_num_results, print_prep, print_enum, homo);
+    else if (algorithm == "parrallel_symbi")
+        mm = parrallel      = new Parrllel_SymBi(query_graph, data_graph, max_num_results, print_prep, print_enum, homo, orders);
     else if (algorithm == "none")
         mm                  = new matching      (query_graph, data_graph, max_num_results, print_prep, print_enum, homo);
     else
