@@ -411,6 +411,8 @@ void Parrllel_SymBi::InsertionTopDown(uint u, uint u_c, uint v, uint v_c)
         if (np1[u_c][v_c] == treeNode_[u_c].backwards_.size())
         {
             d1[u_c][v_c] = 1;
+            // emplace() 方法在 std::queue 中用于直接在队列内部创建（构造）一个元素，
+            // 而不需要先创建一个临时对象并将它拷贝或移动到队列中。它可以避免不必要的拷贝或移动操作，特别是在元素类型比较复杂时。
             Q1.emplace(u_c, v_c);
             if (nc2[u_c][v_c] == treeNode_[u_c].forwards_.size())
             {
@@ -470,6 +472,7 @@ void Parrllel_SymBi::DeletionBottomUp(uint u, uint u_p, uint v, uint v_p)
 }
 
 
+//  Main workhorse function
 void Parrllel_SymBi::FindMatches(uint depth, std::vector<uint>& m, 
         std::vector<ExtendableVertex>& extendable, size_t &num_results)
 {
@@ -514,6 +517,12 @@ void Parrllel_SymBi::FindMatches(uint depth, std::vector<uint>& m,
     // enumerate each neighbor of m[u_min]
     bool candidate_empty = true;
     
+    // 第二个FindMatches函数与第一个类似，但它使用了预定义的顺序和邻居信息来进行匹配。
+    // 函数首先检查是否达到时间限制，然后根据预定义的顺序选择当前要匹配的顶点u。
+    // 接下来，它会选择一个邻居顶点u_min，并遍历u_min的所有候选匹配顶点v，
+    // 进行一系列检查：索引检查、可连接性检查、访问检查。如果所有检查都通过，
+    // 则将v映射到u，并递归调用FindMatches函数进行下一层的匹配。如果找到匹配结果，
+    // 则增加结果计数并打印结果。最后，函数会回溯，将顶点v标记为未访问，并恢复顶点u的未匹配状态。
     for (auto& v: DCS_[eidx_[u_min][u]][m[u_min]])
     {
         // 1. check index
@@ -523,6 +532,7 @@ void Parrllel_SymBi::FindMatches(uint depth, std::vector<uint>& m,
 
         // 2. check if joinable
         bool joinable = true;
+        int i_cnt =0;
         for (auto& u_other: treeNode_[u].neighbors_)
         {
             if (m[u_other] == UNMATCHED || u_other == u_min) continue;
@@ -536,6 +546,8 @@ void Parrllel_SymBi::FindMatches(uint depth, std::vector<uint>& m,
                 break;
             }
         }
+        // printf("i_cnt: %d\n", i_cnt);
+
         if (!joinable) continue;
         num_intermediate_results_after_joinability_check_++;
 
@@ -616,7 +628,7 @@ void Parrllel_SymBi::FindMatches(uint order_index, uint depth, std::vector<uint>
         #pragma omp parallel for reduction(min: u_min_size) reduction(min: u_min)
         for (size_t i = 0; i < treeNode_[u].neighbors_.size(); ++i)
         {
-            auto& u_other = treeNode_[u].neighbors_[i];
+            auto& u_other = treeNode_[u].neighbors_[i]; // var
             if (m[u_other] == UNMATCHED) continue;
 
             int size = DCS_[eidx_[u_other][u]][m[u_other]].size();
@@ -635,6 +647,9 @@ void Parrllel_SymBi::FindMatches(uint order_index, uint depth, std::vector<uint>
 
     // enumerate each neighbor of m[u_min]
     bool candidate_empty = true;
+
+    // DCS: std::vector<std::unordered_map<uint, std::vector<uint>>> 
+    //                      ~var  ~var  
     for (auto& v: DCS_[eidx_[u_min][u]][m[u_min]])
     {
         // 1. check index
@@ -837,6 +852,7 @@ void Parrllel_SymBi::AddEdge(uint v1, uint v2, uint label)
     num_positive_results_ += num_results;
 }
 
+
 void Parrllel_SymBi::RemoveEdge(uint v1, uint v2)
 {
     std::vector<uint> m(query_.NumVertices(), UNMATCHED);
@@ -848,64 +864,64 @@ void Parrllel_SymBi::RemoveEdge(uint v1, uint v2)
     for (uint u1 = 0; u1 < query_.NumVertices(); u1++)
     if (data_.GetVertexLabel(v1) == query_.GetVertexLabel(u1))
     {
-    for (uint u2 = 0; u2 < query_.NumVertices(); u2++)
-    if (data_.GetVertexLabel(v2) == query_.GetVertexLabel(u2))
-    {
-        auto it = std::lower_bound(DCS_[eidx_[u1][u2]][v1].begin(), DCS_[eidx_[u1][u2]][v1].end(), v2);
-        if (
-            it == DCS_[eidx_[u1][u2]][v1].end() ||
-            *it != v2
-        ) continue;
-        
-        bool reversed = false;
-        if (std::find(treeNode_[u1].backwards_.begin(), treeNode_[u1].backwards_.end(), u2) != treeNode_[u1].backwards_.end())
+        for (uint u2 = 0; u2 < query_.NumVertices(); u2++)
+        if (data_.GetVertexLabel(v2) == query_.GetVertexLabel(u2))
         {
-            std::swap(u1, u2);
-            std::swap(v1, v2);
-            reversed = true;
-        }
-        if (std::find(treeNode_[u2].backwards_.begin(), treeNode_[u2].backwards_.end(), u1) != treeNode_[u2].backwards_.end()
-            && d2[u1][v1] == 1 && d2[u2][v2] == 1)
-        {
-            m[u1] = v1;
-            m[u2] = v2;
-            visited_[v1] = true;
-            visited_[v2] = true;
-
-            std::vector<ExtendableVertex> extendable(query_.NumVertices());
-            for (auto u: {u1, u2})
+            auto it = std::lower_bound(DCS_[eidx_[u1][u2]][v1].begin(), DCS_[eidx_[u1][u2]][v1].end(), v2);
+            if (
+                it == DCS_[eidx_[u1][u2]][v1].end() ||
+                *it != v2
+            ) continue;
+            
+            bool reversed = false;
+            if (std::find(treeNode_[u1].backwards_.begin(), treeNode_[u1].backwards_.end(), u2) != treeNode_[u1].backwards_.end())
             {
-                for (auto& u_other: treeNode_[u].neighbors_)
-                {
-                    if (m[u_other] != UNMATCHED) continue;
-
-                    if (n2[eidx_[u][u_other]][m[u]] < extendable[u_other].E)
-                    {
-                        extendable[u_other].E = n2[eidx_[u][u_other]][m[u]];
-                        extendable[u_other].u_min = u;
-                    }
-                    extendable[u_other].matched_nbrs ++;
-                }
+                std::swap(u1, u2);
+                std::swap(v1, v2);
+                reversed = true;
             }
-            if (pre_defined_order_.empty())
-                FindMatches(2, m, extendable, num_results);
-            else
-                FindMatches(eidx_[std::min(u1, u2)][std::max(u1, u2)], 2, m, 
-                        num_results);
+            if (std::find(treeNode_[u2].backwards_.begin(), treeNode_[u2].backwards_.end(), u1) != treeNode_[u2].backwards_.end()
+                && d2[u1][v1] == 1 && d2[u2][v2] == 1)
+            {
+                m[u1] = v1;
+                m[u2] = v2;
+                visited_[v1] = true;
+                visited_[v2] = true;
 
-            visited_[v1] = false;
-            visited_[v2] = false;
-            m[u1] = UNMATCHED;
-            m[u2] = UNMATCHED;
-            if (num_results >= max_num_results_) goto END_ENUMERATION;
-            if (reach_time_limit) return;
+                std::vector<ExtendableVertex> extendable(query_.NumVertices());
+                for (auto u: {u1, u2})
+                {
+                    for (auto& u_other: treeNode_[u].neighbors_)
+                    {
+                        if (m[u_other] != UNMATCHED) continue;
+
+                        if (n2[eidx_[u][u_other]][m[u]] < extendable[u_other].E)
+                        {
+                            extendable[u_other].E = n2[eidx_[u][u_other]][m[u]];
+                            extendable[u_other].u_min = u;
+                        }
+                        extendable[u_other].matched_nbrs ++;
+                    }
+                }
+                if (pre_defined_order_.empty())
+                    FindMatches(2, m, extendable, num_results);
+                else
+                    FindMatches(eidx_[std::min(u1, u2)][std::max(u1, u2)], 2, m, 
+                            num_results);
+
+                visited_[v1] = false;
+                visited_[v2] = false;
+                m[u1] = UNMATCHED;
+                m[u2] = UNMATCHED;
+                if (num_results >= max_num_results_) goto END_ENUMERATION;
+                if (reach_time_limit) return;
+            }
+            if (reversed)
+            {
+                std::swap(u1, u2);
+                std::swap(v1, v2);
+            }
         }
-        if (reversed)
-        {
-            std::swap(u1, u2);
-            std::swap(v1, v2);
-        }
-    }
     }
 
     END_ENUMERATION:
@@ -952,28 +968,29 @@ void Parrllel_SymBi::RemoveEdge(uint v1, uint v2)
                 auto [u_queue, v_queue] = Q1.front();
                 Q1.pop();
                 for (auto& u_c_queue : treeNode_[u_queue].forwards_)
-                for (auto& v_c_queue : DCS_[eidx_[u_queue][u_c_queue]][v_queue])
-                {
-                    DeletionTopDown(u_queue, u_c_queue, v_queue, v_c_queue);
-                    if (reach_time_limit) return;
-                }
+                    for (auto& v_c_queue : DCS_[eidx_[u_queue][u_c_queue]][v_queue])
+                    {
+                        DeletionTopDown(u_queue, u_c_queue, v_queue, v_c_queue);
+                        if (reach_time_limit) return;
+                    }
             }
+
             while (!Q2.empty())
             {
                 auto [u_queue, v_queue] = Q2.front();
                 Q2.pop();
                 for (auto& u_p_queue : treeNode_[u_queue].backwards_)
-                for (auto& v_p_queue : DCS_[eidx_[u_queue][u_p_queue]][v_queue])
-                {
-                    DeletionBottomUp(u_queue, u_p_queue, v_queue, v_p_queue);
-                    if (reach_time_limit) return;
-                }
+                    for (auto& v_p_queue : DCS_[eidx_[u_queue][u_p_queue]][v_queue])
+                    {
+                        DeletionBottomUp(u_queue, u_p_queue, v_queue, v_p_queue);
+                        if (reach_time_limit) return;
+                    }
                 for (auto& u_c_queue : treeNode_[u_queue].forwards_)
-                for (auto& v_c_queue : DCS_[eidx_[u_queue][u_c_queue]][v_queue])
-                {
-                    n2[eidx_[u_c_queue][u_queue]][v_c_queue] -= 1;
-                    if (reach_time_limit) return;
-                }
+                    for (auto& v_c_queue : DCS_[eidx_[u_queue][u_c_queue]][v_queue])
+                    {
+                        n2[eidx_[u_c_queue][u_queue]][v_c_queue] -= 1;
+                        if (reach_time_limit) return;
+                    }
             }
         }
         if (reversed)

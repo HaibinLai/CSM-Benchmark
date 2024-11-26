@@ -1,7 +1,7 @@
 CC = g++ -fdiagnostics-color=always
 FLAGS = -std=c++17 -g -O3 -Wall -I.
 
-FLAGS += -fopenmp
+FLAGS += -fopenmp # using library openmp
 
 OPENMP_FLAGS = -fopenmp
 
