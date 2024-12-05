@@ -678,7 +678,7 @@ void SymBi::FindMatches(uint order_index, uint depth, std::vector<uint>& m, size
 
 void SymBi::AddEdge(uint v1, uint v2, uint label)
 {
-    data_.AddEdge(v1, v2, label);
+    data_.AddEdge(v1, v2, label); // add edge to data graph
 
     // enumerate all query edges that matches v1 --> v2
     for (uint u1 = 0; u1 < query_.NumVertices(); u1++)
@@ -721,7 +721,7 @@ void SymBi::AddEdge(uint v1, uint v2, uint label)
                                 if (reach_time_limit) return;
                             }
                         }
-                        while (!Q2.empty())
+                        while (!Q2.empty())//
                         {
                             auto [u_queue, v_queue] = Q2.front();
                             Q2.pop();

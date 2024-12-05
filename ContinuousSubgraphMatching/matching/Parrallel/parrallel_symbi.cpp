@@ -396,6 +396,7 @@ void Parrllel_SymBi::InitialMatching()
             }
             extendable[u_other].matched_nbrs ++;
         }
+        //         vertex m, extendable, Result counting
         FindMatches(1, m, extendable, num_initial_results_);
 
         visited_[v] = false;
@@ -472,7 +473,7 @@ void Parrllel_SymBi::DeletionBottomUp(uint u, uint u_p, uint v, uint v_p)
 }
 
 
-//  Main workhorse function
+//  Main workhorse function, extendable
 void Parrllel_SymBi::FindMatches(uint depth, std::vector<uint>& m, 
         std::vector<ExtendableVertex>& extendable, size_t &num_results)
 {
@@ -716,11 +717,14 @@ void Parrllel_SymBi::FindMatches(uint order_index, uint depth, std::vector<uint>
 
 void Parrllel_SymBi::AddEdge(uint v1, uint v2, uint label)
 {
+    // Graph Update
     data_.AddEdge(v1, v2, label);
 
     // enumerate all query edges that matches v1 --> v2
     for (uint u1 = 0; u1 < query_.NumVertices(); u1++)
+        //  Get v1's label
         if (data_.GetVertexLabel(v1) == query_.GetVertexLabel(u1)){
+            // Get v2's label
             for (uint u2 = 0; u2 < query_.NumVertices(); u2++)
                 if (data_.GetVertexLabel(v2) == query_.GetVertexLabel(u2)){
                     if (std::get<2>(query_.GetEdgeLabel(u1, u2)) != label) continue;
@@ -1004,6 +1008,10 @@ void Parrllel_SymBi::RemoveEdge(uint v1, uint v2)
     data_.RemoveEdge(v1, v2);
 }
 
+
+
+// Add and remove vertex don't need to do much work
+
 void Parrllel_SymBi::AddVertex(uint id, uint label)
 {
     data_.AddVertex(id, label);
@@ -1060,6 +1068,8 @@ void Parrllel_SymBi::RemoveVertex(uint id)
     data_.RemoveVertex(id);
 }
 
+
+// Evauluation
 void Parrllel_SymBi::GetMemoryCost(size_t &num_edges, size_t &num_vertices)
 {
     num_edges = 0ul;
