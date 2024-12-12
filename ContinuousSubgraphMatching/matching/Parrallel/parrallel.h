@@ -36,6 +36,7 @@ private:
     std::vector<std::vector<uint>> pre_defined_order_;
     std::vector<std::vector<uint>> pre_defined_backward_nbr_;
 
+// K-V
     std::vector<std::unordered_map<uint, std::vector<uint>>> DCS_;
 
     std::vector<std::unordered_map<uint, bool>> d1;
@@ -47,8 +48,13 @@ private:
     std::vector<std::unordered_map<uint, uint>> n2;
     std::vector<std::unordered_map<uint, uint>> nc2;
     
-    std::queue<std::pair<uint, uint>> Q1;
+    // 用于存储需要进行 InsertionTopDown 操作的节点对。
+    std::queue<std::pair<uint, uint>> Q1; // queue 是比较难并行的东西.  only TopDown Method
+    // 用于存储需要进行 InsertionBottomUp 操作的节点对。当某个节点对 (u, v) 满足一定条件时，会将其加入 Q2。
+    // 在 Q2 非空时，会从队列中取出节点对 (u_queue, v_queue)，并对其进行 InsertionBottomUp 操作。
     std::queue<std::pair<uint, uint>> Q2;
+
+    // 并行idea：把 Q1 做成std::vector<std::queue<std::pair<uint, uint>>>，每个线程处理一个队列。
 
 public:
 

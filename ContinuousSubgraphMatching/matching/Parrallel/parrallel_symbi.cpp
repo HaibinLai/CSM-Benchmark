@@ -4,7 +4,7 @@
 #include <unordered_set>
 #include <vector>
 
-#include <omp.h>
+#include <omp.h> // for openmp
 
 #include "utils/types.h"
 #include "utils/globals.h"
@@ -404,6 +404,8 @@ void Parrllel_SymBi::InitialMatching()
     }
 }
 
+// #################### RUNTIME METHODS #################### // 
+
 void Parrllel_SymBi::InsertionTopDown(uint u, uint u_c, uint v, uint v_c)
 {
     if (n1[eidx_[u_c][u]][v_c] == 0)
@@ -414,6 +416,8 @@ void Parrllel_SymBi::InsertionTopDown(uint u, uint u_c, uint v, uint v_c)
             d1[u_c][v_c] = 1;
             // emplace() 方法在 std::queue 中用于直接在队列内部创建（构造）一个元素，
             // 而不需要先创建一个临时对象并将它拷贝或移动到队列中。它可以避免不必要的拷贝或移动操作，特别是在元素类型比较复杂时。
+            //  It constructs the element in place, meaning it directly constructs the element within the container 
+            // without the need for a temporary object, which can be more efficient than using functions like push_back or push
             Q1.emplace(u_c, v_c);
             if (nc2[u_c][v_c] == treeNode_[u_c].forwards_.size())
             {
@@ -472,7 +476,7 @@ void Parrllel_SymBi::DeletionBottomUp(uint u, uint u_p, uint v, uint v_p)
     }
 }
 
-
+// M
 //  Main workhorse function, extendable
 void Parrllel_SymBi::FindMatches(uint depth, std::vector<uint>& m, 
         std::vector<ExtendableVertex>& extendable, size_t &num_results)
@@ -722,14 +726,17 @@ void Parrllel_SymBi::AddEdge(uint v1, uint v2, uint label)
 
     // enumerate all query edges that matches v1 --> v2
     for (uint u1 = 0; u1 < query_.NumVertices(); u1++)
-        //  Get v1's label
+        //  Get v1 that label matched to query label
         if (data_.GetVertexLabel(v1) == query_.GetVertexLabel(u1)){
-            // Get v2's label
+
+            // Get v2 that label matched to query vertex
             for (uint u2 = 0; u2 < query_.NumVertices(); u2++)
                 if (data_.GetVertexLabel(v2) == query_.GetVertexLabel(u2)){
+
                     if (std::get<2>(query_.GetEdgeLabel(u1, u2)) != label) continue;
                     
                     bool reversed = false;
+                    // 容器中查找 u2
                     if (std::find(treeNode_[u1].backwards_.begin(), treeNode_[u1].backwards_.end(), u2) != treeNode_[u1].backwards_.end())
                     {
                         std::swap(u1, u2);
@@ -757,30 +764,36 @@ void Parrllel_SymBi::AddEdge(uint v1, uint v2, uint label)
                             auto [u_queue, v_queue] = Q1.front();
                             Q1.pop();
                             for (auto& u_c_queue : treeNode_[u_queue].forwards_)
-                            for (auto& v_c_queue : DCS_[eidx_[u_queue][u_c_queue]][v_queue])
-                            {
-                                InsertionTopDown(u_queue, u_c_queue, v_queue, v_c_queue);
-                                if (reach_time_limit) return;
-                            }
+                                for (auto& v_c_queue : DCS_[eidx_[u_queue][u_c_queue]][v_queue])
+                                {
+                                    InsertionTopDown(u_queue, u_c_queue, v_queue, v_c_queue);
+                                    if (reach_time_limit) return;
+                                }
                         }
+
+                        // thread N end, join
+
                         while (!Q2.empty())
                         {
                             auto [u_queue, v_queue] = Q2.front();
                             Q2.pop();
                             for (auto& u_p_queue : treeNode_[u_queue].backwards_)
-                            for (auto& v_p_queue : DCS_[eidx_[u_queue][u_p_queue]][v_queue])
-                            {
-                                InsertionBottomUp(u_queue, u_p_queue, v_queue, v_p_queue);
-                                if (reach_time_limit) return;
-                            }
+                                for (auto& v_p_queue : DCS_[eidx_[u_queue][u_p_queue]][v_queue])
+                                {
+                                    InsertionBottomUp(u_queue, u_p_queue, v_queue, v_p_queue);
+                                    if (reach_time_limit) return;
+                                }
                             for (auto& u_c_queue : treeNode_[u_queue].forwards_)
-                            for (auto& v_c_queue : DCS_[eidx_[u_queue][u_c_queue]][v_queue])
-                            {
-                                n2[eidx_[u_c_queue][u_queue]][v_c_queue] += 1;
-                                if (reach_time_limit) return;
-                            }
+                                for (auto& v_c_queue : DCS_[eidx_[u_queue][u_c_queue]][v_queue])
+                                {
+                                    n2[eidx_[u_c_queue][u_queue]][v_c_queue] += 1;
+                                    if (reach_time_limit) return;
+                                }
                         }
                     }
+
+                    // thread N end, join 
+
                     if (reversed)
                     {
                         std::swap(u1, u2);

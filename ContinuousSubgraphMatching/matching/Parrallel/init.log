@@ -1,0 +1,286 @@
+(base) haibin@hpclab03:~/CSM-Benchmark/ContinuousSubgraphMatching$ bash run_parrallel.sh 
+[sudo] password for haibin: 
+----------- Loading graphs ------------
+# vertices = 6
+# edges = 8
+# vertices = 4847571
+# edges = 38566113
+Load Graphs: 31126.4ms
+------------ Preprocessing ------------
+DAG: 
+3: (backwards: ) (forwards: 0 4 5 )
+0: (backwards: 3 ) (forwards: 2 5 )
+4: (backwards: 3 ) (forwards: 1 2 5 )
+5: (backwards: 0 3 4 ) (forwards: )
+2: (backwards: 0 4 ) (forwards: )
+1: (backwards: 4 ) (forwards: )
+
+Preprocessing: 5611.04ms
+----------- Initial Matching ----------
+Initial Matching: 1438.06ms
+17556514 matches. 
+--------- Incremental Matching --------
+Incremental Matching: 7074.92ms
+0 vertex updates.
+4285124 edge updates.
+24536789 positive matches.
+0 negative matches.
+55958812 intermediate results before index check.
+55189395 intermediate results after index check.
+45851724 intermediate results after joinability check.
+45851724 intermediate results after visit check.
+158217 intermediate results with empty candidate set.
+186527 intermediate results without results.
+# vertices in index: 0: 66104 1: 45266 2: 66186 3: 79423 4: 79377 5: 79585 
+# d1 vertex in index: 0: 32000 1: 33243 2: 17341 3: 79423 4: 35534 5: 13844 
+# d2 vertex in index: 0: 11218 1: 33243 2: 17341 3: 7781 4: 9679 5: 13844 
+# edges in index: 0-2: 97378 0-5: 95840 3-0: 96104 3-4: 93367 3-5: 92660 4-1: 94008 4-2: 94428 4-5: 94220 
+# d1 edges in index: 0-2: 58159 0-5: 51416 3-0: 96104 3-4: 93367 3-5: 48331 4-1: 80139 4-2: 56344 4-5: 50192 
+# d2 edges in index: 0-2: 48455 0-5: 47106 3-0: 37971 3-4: 37022 3-5: 35786 4-1: 40801 4-2: 42090 4-5: 42218 
+# candidates vertices: 211385
+# valid candidates vertices: 93106
+# candidates edges: 534052
+# valid candidates edges: 331449
+
+# edges in index in total: 758005
+# vertices in index in total: 415941
+Peak Virtual Memory: 2138236 KB
+
+----------------- End -----------------
+----------- Loading graphs ------------
+# vertices = 6
+# edges = 8
+# vertices = 4847571
+# edges = 38566113
+Load Graphs: 31192.2ms
+------------ Preprocessing ------------
+DAG: 
+3: (backwards: ) (forwards: 0 4 5 )
+0: (backwards: 3 ) (forwards: 2 5 )
+4: (backwards: 3 ) (forwards: 1 2 5 )
+5: (backwards: 0 3 4 ) (forwards: )
+2: (backwards: 0 4 ) (forwards: )
+1: (backwards: 4 ) (forwards: )
+
+Preprocessing: 5820.15ms
+----------- Initial Matching ----------
+Initial Matching: 1435.56ms
+17556514 matches. 
+--------- Incremental Matching --------
+Incremental Matching: 7752.29ms
+0 vertex updates.
+4285124 edge updates.
+24536789 positive matches.
+0 negative matches.
+55958812 intermediate results before index check.
+55189395 intermediate results after index check.
+45851724 intermediate results after joinability check.
+45851724 intermediate results after visit check.
+158217 intermediate results with empty candidate set.
+186527 intermediate results without results.
+# vertices in index: 0: 66104 1: 45266 2: 66186 3: 79423 4: 79377 5: 79585 
+# d1 vertex in index: 0: 32000 1: 33243 2: 17341 3: 79423 4: 35534 5: 13844 
+# d2 vertex in index: 0: 11218 1: 33243 2: 17341 3: 7781 4: 9679 5: 13844 
+# edges in index: 0-2: 97378 0-5: 95840 3-0: 96104 3-4: 93367 3-5: 92660 4-1: 94008 4-2: 94428 4-5: 94220 
+# d1 edges in index: 0-2: 58159 0-5: 51416 3-0: 96104 3-4: 93367 3-5: 48331 4-1: 80139 4-2: 56344 4-5: 50192 
+# d2 edges in index: 0-2: 48455 0-5: 47106 3-0: 37971 3-4: 37022 3-5: 35786 4-1: 40801 4-2: 42090 4-5: 42218 
+# candidates vertices: 211385
+# valid candidates vertices: 93106
+# candidates edges: 534052
+# valid candidates edges: 331449
+
+# edges in index in total: 758005
+# vertices in index in total: 415941
+Peak Virtual Memory: 2138236 KB
+
+----------------- End -----------------
+
+----------- Loading graphs ------------
+# vertices = 6
+# edges = 8
+# vertices = 4847571
+# edges = 38566113
+Load Graphs: 29615.1ms
+------------ Preprocessing ------------
+DAG: 
+3: (backwards: ) (forwards: 0 4 5 )
+0: (backwards: 3 ) (forwards: 2 5 )
+4: (backwards: 3 ) (forwards: 1 2 5 )
+5: (backwards: 0 3 4 ) (forwards: )
+2: (backwards: 0 4 ) (forwards: )
+1: (backwards: 4 ) (forwards: )
+
+Preprocessing: 5948.83ms
+----------- Initial Matching ----------
+Initial Matching: 1503.39ms
+17556514 matches. 
+--------- Incremental Matching --------
+Incremental Matching: 9164.95ms
+0 vertex updates.
+4285124 edge updates.
+24536789 positive matches.
+0 negative matches.
+55958812 intermediate results before index check.
+55189395 intermediate results after index check.
+45851724 intermediate results after joinability check.
+45851724 intermediate results after visit check.
+158217 intermediate results with empty candidate set.
+186527 intermediate results without results.
+# vertices in index: 0: 66104 1: 45266 2: 66186 3: 79423 4: 79377 5: 79585 
+# d1 vertex in index: 0: 32000 1: 33243 2: 17341 3: 79423 4: 35534 5: 13844 
+# d2 vertex in index: 0: 11218 1: 33243 2: 17341 3: 7781 4: 9679 5: 13844 
+# edges in index: 0-2: 97378 0-5: 95840 3-0: 96104 3-4: 93367 3-5: 92660 4-1: 94008 4-2: 94428 4-5: 94220 
+# d1 edges in index: 0-2: 58159 0-5: 51416 3-0: 96104 3-4: 93367 3-5: 48331 4-1: 80139 4-2: 56344 4-5: 50192 
+# d2 edges in index: 0-2: 48455 0-5: 47106 3-0: 37971 3-4: 37022 3-5: 35786 4-1: 40801 4-2: 42090 4-5: 42218 
+# candidates vertices: 211385
+# valid candidates vertices: 93106
+# candidates edges: 534052
+# valid candidates edges: 331449
+
+# edges in index in total: 758005
+# vertices in index in total: 415941
+Peak Virtual Memory: 2138236 KB
+
+----------------- End -----------------
+----------- Loading graphs ------------
+# vertices = 6
+# edges = 8
+# vertices = 4847571
+# edges = 38566113
+Load Graphs: 30018.9ms
+------------ Preprocessing ------------
+DAG: 
+3: (backwards: ) (forwards: 0 4 5 )
+0: (backwards: 3 ) (forwards: 2 5 )
+4: (backwards: 3 ) (forwards: 1 2 5 )
+5: (backwards: 0 3 4 ) (forwards: )
+2: (backwards: 0 4 ) (forwards: )
+1: (backwards: 4 ) (forwards: )
+
+Preprocessing: 5895.25ms
+----------- Initial Matching ----------
+Initial Matching: 1442.29ms
+17556514 matches. 
+--------- Incremental Matching --------
+Incremental Matching: 6926.27ms
+0 vertex updates.
+4285124 edge updates.
+24536789 positive matches.
+0 negative matches.
+55958812 intermediate results before index check.
+55189395 intermediate results after index check.
+45851724 intermediate results after joinability check.
+45851724 intermediate results after visit check.
+158217 intermediate results with empty candidate set.
+186527 intermediate results without results.
+# vertices in index: 0: 66104 1: 45266 2: 66186 3: 79423 4: 79377 5: 79585 
+# d1 vertex in index: 0: 32000 1: 33243 2: 17341 3: 79423 4: 35534 5: 13844 
+# d2 vertex in index: 0: 11218 1: 33243 2: 17341 3: 7781 4: 9679 5: 13844 
+# edges in index: 0-2: 97378 0-5: 95840 3-0: 96104 3-4: 93367 3-5: 92660 4-1: 94008 4-2: 94428 4-5: 94220 
+# d1 edges in index: 0-2: 58159 0-5: 51416 3-0: 96104 3-4: 93367 3-5: 48331 4-1: 80139 4-2: 56344 4-5: 50192 
+# d2 edges in index: 0-2: 48455 0-5: 47106 3-0: 37971 3-4: 37022 3-5: 35786 4-1: 40801 4-2: 42090 4-5: 42218 
+# candidates vertices: 211385
+# valid candidates vertices: 93106
+# candidates edges: 534052
+# valid candidates edges: 331449
+
+# edges in index in total: 758005
+# vertices in index in total: 415941
+Peak Virtual Memory: 2138236 KB
+
+----------------- End -----------------
+
+----------- Loading graphs ------------
+# vertices = 6
+# edges = 8
+# vertices = 4847571
+# edges = 38566113
+Load Graphs: 29512.9ms
+------------ Preprocessing ------------
+DAG: 
+3: (backwards: ) (forwards: 0 4 5 )
+0: (backwards: 3 ) (forwards: 2 5 )
+4: (backwards: 3 ) (forwards: 1 2 5 )
+5: (backwards: 0 3 4 ) (forwards: )
+2: (backwards: 0 4 ) (forwards: )
+1: (backwards: 4 ) (forwards: )
+
+Preprocessing: 5293.67ms
+----------- Initial Matching ----------
+Initial Matching: 1422.78ms
+17556514 matches. 
+--------- Incremental Matching --------
+Incremental Matching: 9928.6ms
+0 vertex updates.
+4285124 edge updates.
+24536789 positive matches.
+0 negative matches.
+55958812 intermediate results before index check.
+55189395 intermediate results after index check.
+45851724 intermediate results after joinability check.
+45851724 intermediate results after visit check.
+158217 intermediate results with empty candidate set.
+186527 intermediate results without results.
+# vertices in index: 0: 66104 1: 45266 2: 66186 3: 79423 4: 79377 5: 79585 
+# d1 vertex in index: 0: 32000 1: 33243 2: 17341 3: 79423 4: 35534 5: 13844 
+# d2 vertex in index: 0: 11218 1: 33243 2: 17341 3: 7781 4: 9679 5: 13844 
+# edges in index: 0-2: 97378 0-5: 95840 3-0: 96104 3-4: 93367 3-5: 92660 4-1: 94008 4-2: 94428 4-5: 94220 
+# d1 edges in index: 0-2: 58159 0-5: 51416 3-0: 96104 3-4: 93367 3-5: 48331 4-1: 80139 4-2: 56344 4-5: 50192 
+# d2 edges in index: 0-2: 48455 0-5: 47106 3-0: 37971 3-4: 37022 3-5: 35786 4-1: 40801 4-2: 42090 4-5: 42218 
+# candidates vertices: 211385
+# valid candidates vertices: 93106
+# candidates edges: 534052
+# valid candidates edges: 331449
+
+# edges in index in total: 758005
+# vertices in index in total: 415941
+Peak Virtual Memory: 2138236 KB
+
+----------------- End -----------------
+----------- Loading graphs ------------
+# vertices = 6
+# edges = 8
+# vertices = 4847571
+# edges = 38566113
+Load Graphs: 30668.6ms
+------------ Preprocessing ------------
+DAG: 
+3: (backwards: ) (forwards: 0 4 5 )
+0: (backwards: 3 ) (forwards: 2 5 )
+4: (backwards: 3 ) (forwards: 1 2 5 )
+5: (backwards: 0 3 4 ) (forwards: )
+2: (backwards: 0 4 ) (forwards: )
+1: (backwards: 4 ) (forwards: )
+
+Preprocessing: 5583.74ms
+----------- Initial Matching ----------
+Initial Matching: 1475.7ms
+17556514 matches. 
+--------- Incremental Matching --------
+Incremental Matching: 6948.49ms
+0 vertex updates.
+4285124 edge updates.
+24536789 positive matches.
+0 negative matches.
+55958812 intermediate results before index check.
+55189395 intermediate results after index check.
+45851724 intermediate results after joinability check.
+45851724 intermediate results after visit check.
+158217 intermediate results with empty candidate set.
+186527 intermediate results without results.
+# vertices in index: 0: 66104 1: 45266 2: 66186 3: 79423 4: 79377 5: 79585 
+# d1 vertex in index: 0: 32000 1: 33243 2: 17341 3: 79423 4: 35534 5: 13844 
+# d2 vertex in index: 0: 11218 1: 33243 2: 17341 3: 7781 4: 9679 5: 13844 
+# edges in index: 0-2: 97378 0-5: 95840 3-0: 96104 3-4: 93367 3-5: 92660 4-1: 94008 4-2: 94428 4-5: 94220 
+# d1 edges in index: 0-2: 58159 0-5: 51416 3-0: 96104 3-4: 93367 3-5: 48331 4-1: 80139 4-2: 56344 4-5: 50192 
+# d2 edges in index: 0-2: 48455 0-5: 47106 3-0: 37971 3-4: 37022 3-5: 35786 4-1: 40801 4-2: 42090 4-5: 42218 
+# candidates vertices: 211385
+# valid candidates vertices: 93106
+# candidates edges: 534052
+# valid candidates edges: 331449
+
+# edges in index in total: 758005
+# vertices in index in total: 415941
+Peak Virtual Memory: 2138236 KB
+
+----------------- End -----------------
