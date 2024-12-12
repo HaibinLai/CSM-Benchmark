@@ -37,6 +37,10 @@ private:
     std::vector<std::vector<uint>> pre_defined_backward_nbr_;
 
 // K-V
+// 如果对内存要求比较高的程序，使用vector一定要小心了，当vector空间不足时，会申请一块约是当前占用内存两倍的新空间以存储更多的数据，
+// 若可用内存为1G，而当前vector已占用的内存空间0.5G，当再插入一个元素，vector将会申请一块约1G的内存空间，瞬间内存就被用光了，导致程序崩溃。
+// 的内存空间中，接着，旧的内存空间将会被回收。这里就可能会出现问题了，当vector指向新的内存空间之后，原来指向旧内存空间的迭代器都会失效了，
+// 若再使用这些失效迭代器，将会出现coredump。因为当需要插入数据到vector的时候，就需要注意当前的迭代器还是否有效了。
     std::vector<std::unordered_map<uint, std::vector<uint>>> DCS_;
 
     std::vector<std::unordered_map<uint, bool>> d1;

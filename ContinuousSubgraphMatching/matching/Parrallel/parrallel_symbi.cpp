@@ -11,6 +11,8 @@
 #include "graph/graph.h"
 #include "matching/Parrallel/parrallel.h"
 
+#define Print_Time_Nano(str, start) std::cout << str << std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start).count() << " ns" << std::endl
+
 Parrllel_SymBi::Parrllel_SymBi(Graph& query_graph, Graph& data_graph, 
         uint max_num_results,
         bool print_prep, 
@@ -19,7 +21,8 @@ Parrllel_SymBi::Parrllel_SymBi(Graph& query_graph, Graph& data_graph,
         std::vector<std::vector<uint>> orders)
 : matching(
     query_graph, data_graph, max_num_results, 
-    print_prep, print_enum, homo)
+    print_prep, print_enum, homo
+    )
 , eidx_(query_.NumVertices())
 , treeNode_(query_.NumVertices())
 , q_root_(0u)
@@ -33,11 +36,16 @@ Parrllel_SymBi::Parrllel_SymBi(Graph& query_graph, Graph& data_graph,
 , n1(query_.NumEdges() * 2)
 , np1(query_.NumVertices())
 , n2(query_.NumEdges() * 2)
-, nc2(query_.NumVertices())
+, nc2(query_.NumVertices()) // vector均被指定了大小
+// vector 容器扩容时，不同的编译器申请更多内存空间的量是不同的。以 VS 为例，它会扩容现有容器容量的 50%。
 , Q1{}
 , Q2{}
 {
     uint edge_pos = 0;
+    std::chrono::high_resolution_clock::time_point start2, lstart2;
+   
+
+    // Use time: 0.001ms
     for (uint i = 0; i < query_.NumVertices(); i++)
     {
         eidx_[i].resize(query_.NumVertices());
@@ -49,8 +57,13 @@ Parrllel_SymBi::Parrllel_SymBi(Graph& query_graph, Graph& data_graph,
             eidx_[i][u_other] = edge_pos++;
         }
     }
+
+    lstart2 = Get_Time();
+    
+
     if (orders.size() == query_.NumEdges())
-    {
+    {   
+        // start2 = Get_Time();
         pre_defined_order_.resize(query_.NumEdges() * 2);
 
         for (uint i = 0; i < orders.size(); i++)
@@ -60,20 +73,23 @@ Parrllel_SymBi::Parrllel_SymBi(Graph& query_graph, Graph& data_graph,
                 [std::max(orders[i][0], orders[i][1])]
             ] = orders[i];
         }
+        // Print_Time("Test time for 1: ", start2);
     }
     else if (orders.size() == query_.NumEdges() + 1)
     {
+        
         std::vector<std::vector<bool>> is_tree_edge (query_.NumVertices());
         for (uint i = 0; i < query_.NumVertices(); i++)
         {
             is_tree_edge[i].resize(query_.NumVertices(), false);
         }
+        
         for (uint i = 0; i < orders[0].size(); i += 2)
         {
             is_tree_edge[orders[0][i]][orders[0][i + 1]] = true;
             is_tree_edge[orders[0][i + 1]][orders[0][i]] = true;
         }
-
+        
         pre_defined_order_.resize(query_.NumEdges() * 2);
         pre_defined_backward_nbr_.resize(query_.NumEdges() * 2);
 
@@ -104,6 +120,7 @@ Parrllel_SymBi::Parrllel_SymBi(Graph& query_graph, Graph& data_graph,
             }
         }
     }
+    // Print_Time("Test time for 5: ", lstart2); // Test time for 5: 0ms
 }
 
 void Parrllel_SymBi::Preprocessing()
@@ -373,7 +390,7 @@ void Parrllel_SymBi::BuildDCS()
     }
 }
 
-void Parrllel_SymBi::InitialMatching()
+void Parrllel_SymBi::InitialMatching() // 1457.4ms for LJ
 {
     std::vector<uint> m (query_.NumVertices(), UNMATCHED);
     
@@ -721,6 +738,7 @@ void Parrllel_SymBi::FindMatches(uint order_index, uint depth, std::vector<uint>
 
 void Parrllel_SymBi::AddEdge(uint v1, uint v2, uint label)
 {
+    auto start_nano = std::chrono::high_resolution_clock::now();
     // Graph Update
     data_.AddEdge(v1, v2, label);
 
@@ -801,6 +819,14 @@ void Parrllel_SymBi::AddEdge(uint v1, uint v2, uint label)
                     }
                 }
     }
+    // enumerate all query edges that matches v1 --> v2
+
+
+
+    if (reach_time_limit) return;
+
+    
+
     if (max_num_results_ == 0) return;
     
     std::vector<uint> m(query_.NumVertices(), UNMATCHED);
@@ -867,6 +893,8 @@ void Parrllel_SymBi::AddEdge(uint v1, uint v2, uint label)
     }
     END_ENUMERATION:
     num_positive_results_ += num_results;
+    // Print_Nano_Time("Test time for 1 Adding: ", start2);
+    Print_Time_Nano("Duration: ", start_nano);
 }
 
 

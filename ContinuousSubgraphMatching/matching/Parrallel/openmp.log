@@ -1,0 +1,87 @@
+
+if we just use openmp:
+//#  A bad example?    在这个示例中，#pragma omp parallel sections 创建了两个并行部分（sections）。每个部分会在自己的线程中执行。当所有并行部分完成后，程序会继续执行并行部分之后的代码。
+
+-----
+#pragma omp parallel for num_threads(4)
+for (uint u1 = 0; u1 < query_.NumVertices(); u1++) {
+    // Get v1 that label matched to query label
+    if (data_.GetVertexLabel(v1) == query_.GetVertexLabel(u1)) {
+        // Get v2 that label matched to query vertex
+        for (uint u2 = 0; u2 < query_.NumVertices(); u2++) {
+            if (data_.GetVertexLabel(v2) == query_.GetVertexLabel(u2)) {
+                if (std::get<2>(query_.GetEdgeLabel(u1, u2)) != label) continue;
+
+                bool reversed = false;
+                // 容器中查找 u2
+                if (std::find(treeNode_[u1].backwards_.begin(), treeNode_[u1].backwards_.end(), u2) != treeNode_[u1].backwards_.end()) {
+                    std::swap(u1, u2);
+                    std::swap(v1, v2);
+                    reversed = true;
+                }
+                if (std::find(treeNode_[u2].backwards_.begin(), treeNode_[u2].backwards_.end(), u1) != treeNode_[u2].backwards_.end()) {
+                    auto it = std::lower_bound(DCS_[eidx_[u1][u2]][v1].begin(), DCS_[eidx_[u1][u2]][v1].end(), v2);
+                    DCS_[eidx_[u1][u2]][v1].insert(it, v2);
+                    it = std::lower_bound(DCS_[eidx_[u2][u1]][v2].begin(), DCS_[eidx_[u2][u1]][v2].end(), v1);
+                    DCS_[eidx_[u2][u1]][v2].insert(it, v1);
+
+                    bool old_p_d1 = d1[u1][v1], old_p_d2 = d2[u1][v1], old_c_d2 = d2[u2][v2];
+
+                    if (old_p_d1)
+                        InsertionTopDown(u1, u2, v1, v2);
+                    if (old_c_d2)
+                        InsertionBottomUp(u2, u1, v2, v1);
+                    if (old_p_d2)
+                        n2[eidx_[u2][u1]][v2] += 1;
+
+                    #pragma omp parallel sections
+                    {
+                        #pragma omp section
+                        {
+                            while (!Q1.empty()) {
+                                auto [u_queue, v_queue] = Q1.front();
+                                Q1.pop();
+                                for (auto& u_c_queue : treeNode_[u_queue].forwards_)
+                                    for (auto& v_c_queue : DCS_[eidx_[u_queue][u_c_queue]][v_queue]) {
+                                        InsertionTopDown(u_queue, u_c_queue, v_queue, v_c_queue);
+                                        // if (reach_time_limit) return;
+                                    }
+                            }
+                        }
+                        // #pragma omp barrier
+
+                        #pragma omp section
+                        {
+                            while (!Q2.empty()) {
+                                auto [u_queue, v_queue] = Q2.front();
+                                Q2.pop();
+                                for (auto& u_p_queue : treeNode_[u_queue].backwards_)
+                                    for (auto& v_p_queue : DCS_[eidx_[u_queue][u_p_queue]][v_queue]) {
+                                        InsertionBottomUp(u_queue, u_p_queue, v_queue, v_p_queue);
+                                        // if (reach_time_limit) return;
+                                    }
+                                for (auto& u_c_queue : treeNode_[u_queue].forwards_)
+                                    for (auto& v_c_queue : DCS_[eidx_[u_queue][u_c_queue]][v_queue]) {
+                                        n2[eidx_[u_c_queue][u_queue]][v_c_queue] += 1;
+                                        // if (reach_time_limit) return;
+                                    }
+                            }
+                        }
+                        // #pragma omp barrier
+                    }
+                }
+
+                if (reversed) {
+                    std::swap(u1, u2);
+                    std::swap(v1, v2);
+                }
+            }
+        }
+    }
+}
+#pragma omp barrier
+
+
+
+----
+run_parrallel.sh: line 22: 2733588 Segmentation fault      sudo ./build/csm -a ${ALGORITHM} -d ${DATA_GRAPH} -u ${INSERT_GRAPH} -q ${QUERY_GRAPH} --time-limit ${TIME_LIMIT}
