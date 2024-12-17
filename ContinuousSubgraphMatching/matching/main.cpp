@@ -115,12 +115,20 @@ int main(int argc, char *argv[])
     
     size_t num_v_updates = 0ul, num_e_updates = 0ul;
 
-    auto IncrementalFun = [&data_graph, &mm, &num_v_updates, &num_e_updates]()
+    // count unsafe updates
+    size_t positive_num_results_last = 0ul, negative_num_results_last = 0ul;
+    size_t positive_num_results_cur = 0ul, negative_num_results_cur = 0ul;
+    size_t unsafe_updates = 0ul;
+    
+    auto IncrementalFun = [&]()
     {
         while (!data_graph.updates_.empty())
         {
             InsertUnit insert = data_graph.updates_.front();
             data_graph.updates_.pop();
+
+            // count update time
+            auto start_nano = std::chrono::high_resolution_clock::now();
 
             if (insert.type == 'v' && insert.is_add)
             {
@@ -143,6 +151,20 @@ int main(int argc, char *argv[])
                 num_e_updates ++;
             }
             if (reach_time_limit) break;
+
+            // count update time
+            Print_Time_Nano("Duration: ", start_nano);
+
+            // count unsafe update
+            mm->GetNumPositiveResults(positive_num_results_cur);
+            mm->GetNumNegativeResults(negative_num_results_cur);
+            if (positive_num_results_cur != positive_num_results_last || negative_num_results_cur != negative_num_results_last)
+            {
+                positive_num_results_last = positive_num_results_cur;
+                negative_num_results_last = negative_num_results_cur;
+                unsafe_updates ++;
+                std::cout << "Unsafe update number: " << unsafe_updates << std::endl;
+            }
         }
     };
 
@@ -154,6 +176,7 @@ int main(int argc, char *argv[])
 
     std::cout << num_v_updates << " vertex updates.\n";
     std::cout << num_e_updates << " edge updates.\n";
+    std::cout << unsafe_updates << " unsafe updates.\n";
 
     size_t positive_num_results = 0ul, negative_num_results = 0ul;
     mm->GetNumPositiveResults(positive_num_results);

@@ -894,7 +894,7 @@ void Parrllel_SymBi::AddEdge(uint v1, uint v2, uint label)
     END_ENUMERATION:
     num_positive_results_ += num_results;
     // Print_Nano_Time("Test time for 1 Adding: ", start2);
-    Print_Time_Nano("Duration: ", start_nano);
+    // Print_Time_Nano("Duration: ", start_nano);
 }
 
 

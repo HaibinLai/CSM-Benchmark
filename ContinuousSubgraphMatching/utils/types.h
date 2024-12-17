@@ -14,15 +14,11 @@
 
 #define Duration(start) std::chrono::duration_cast<\
     std::chrono::microseconds>(Get_Time() - start).count()/(float)1000
-#define Duration_nano(start) std::chrono::duration_cast<std::chrono::nanoseconds>(Get_Time() - start).count();
 
 #define Print_Time(str, start) std::cout << str << Duration(start) << \
     "ms" << std::endl
-#define Print_Nano_Time(str, start) std::cout << str << Duration_nano(start) << "ns" << std::endl
-
+#define Print_Time_Nano(str, start) std::cout << str << std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now() - start).count() << " ns" << std::endl
 #define Print_Time_Micro(str, start) std::cout << str << std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - start).count() << " us" << std::endl
-
-
 
 
 struct InsertUnit {
